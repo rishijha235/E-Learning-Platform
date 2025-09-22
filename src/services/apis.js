@@ -1,7 +1,8 @@
 
 // require("dotenv").config();
-const REACT_APP_BASE_URL = "http://localhost:4000/api/v1"
-const BASE_URL = REACT_APP_BASE_URL || process.env.REACT_APP_BASE_URL
+// const REACT_APP_BASE_URL = "http://localhost:4000/api/v1"
+const REACT_APP_BASE_URL = "https://studynotion-wy1g.onrender.com"
+const BASE_URL = REACT_APP_BASE_URL
 
 // AUTH ENDPOINTS
 export const endpoints = {
