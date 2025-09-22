@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
 	cors({
-		origin: "https://studynotion.vercel.app",
+		origin: "https://studynotion-kappa-eight.vercel.app/",
 		// origin: "http://localhost:3001",
 		credentials: true,
 	})
