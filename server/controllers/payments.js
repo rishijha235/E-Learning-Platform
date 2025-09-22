@@ -10,8 +10,9 @@ const {
 const { paymentSuccessEmail } = require("../mail/templates/paymentSuccessEmail")
 const CourseProgress = require("../models/CourseProgress")
 
-const RAZORPAY_KEY = "rzp_test_7Qwe9fFABOGb29";
-const RAZORPAY_SECRET = "2f94nIGfpnUt8SSUITgOwrI6";
+const RAZORPAY_KEY = process.env.RAZORPAY_KEY;
+const RAZORPAY_SECRET = process.env.RAZORPAY_SECRET;
+
 // Capture the payment and initiate the Razorpay order
 exports.capturePayment = async (req, res) => {
 
@@ -141,15 +142,15 @@ exports.verifyPayment = async (req, res) => {
       !courses ||
       !userId
     ) {
-      return res.status(200).json({ success: false, message: "Payment Failed" });
+      return res.status(400).json({ success: false, message: "Payment Failed - Missing required fields" });
     }
 
     let body = razorpay_order_id + "|" + razorpay_payment_id;
     console.log("String to hash: ", body);
+    console.log("RAZORPAY_SECRET from env: ", process.env.RAZORPAY_SECRET);
 
-    console.log("process.env.RAZORPAY_SECRET: ", process.env.RAZORPAY_SECRET);
     const expectedSignature = crypto
-      .createHmac("sha256", RAZORPAY_SECRET || process.env.RAZORPAY_SECRET)
+      .createHmac("sha256", process.env.RAZORPAY_SECRET)
       .update(body.toString())
       .digest("hex");
 
@@ -157,6 +158,7 @@ exports.verifyPayment = async (req, res) => {
     console.log("razorpay_signature: ", razorpay_signature);
 
     if (expectedSignature === razorpay_signature) {
+      console.log("Payment signature verified successfully");
       try {
         await enrollStudents(courses, userId, res);
         return res.status(200).json({ success: true, message: "Payment Verified" });
@@ -166,7 +168,8 @@ exports.verifyPayment = async (req, res) => {
       }
     }
 
-    return res.status(200).json({ success: false, message: "Payment Failed 2" });
+    console.log("Signature verification failed");
+    return res.status(400).json({ success: false, message: "Payment verification failed - Invalid signature" });
   } catch (error) {
     console.error("Error in verifyPayment: ", error);
     return res.status(500).json({ success: false, message: "Internal Server Error" });

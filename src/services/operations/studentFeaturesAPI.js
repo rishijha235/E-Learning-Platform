@@ -12,6 +12,8 @@ const {
   SEND_PAYMENT_SUCCESS_EMAIL_API,
 } = studentEndpoints
 
+const RAZORPAY_KEY = process.env.REACT_APP_RAZORPAY_KEY
+
 // Load the Razorpay SDK from the CDN
 function loadScript(src) {
   return new Promise((resolve) => {
@@ -26,6 +28,7 @@ function loadScript(src) {
     document.body.appendChild(script)
   })
 }
+//
 
 // Buy the Course
 export async function BuyCourse(
@@ -65,8 +68,9 @@ export async function BuyCourse(
     console.log("PAYMENT RESPONSE FROM BACKEND............", orderResponse.data)
 
     // Opening the Razorpay SDK
+    console.log("REACT_APP_RAZORPAY_KEY:", RAZORPAY_KEY); // Check if the environment variable is loaded correctly
     const options = {
-      key: process.env.RAZORPAY_KEY,
+      key: RAZORPAY_KEY,  // Use React environment variable
       currency: orderResponse.data.data.currency,
       amount: `${orderResponse.data.data.amount}`,
       order_id: orderResponse.data.data.id,
@@ -89,6 +93,7 @@ export async function BuyCourse(
       toast.error("Oops! Payment Failed.")
       console.log(response.error)
     })
+
   } catch (error) {
     console.log("PAYMENT API ERROR............", error)
     toast.error("Could Not make Payment.")
@@ -108,6 +113,7 @@ async function verifyPayment(bodyData, token, navigate, dispatch) {
     console.log("VERIFY PAYMENT RESPONSE FROM BACKEND............", response)
 
     if (!response.data.success) {
+      console.log("ERROR IN VERIFY PAYMENT............", response)
       throw new Error(response.data.message)
     }
 
